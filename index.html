@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8FA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DCMI 2026">
+<meta name="robots" content="noindex, nofollow">
+<title>DCMI 2026 운영 보드</title>
+<style>
+  :root{
+    --bg:#F7F8FA; --surface:#FFFFFF; --surface2:#FBFCFD;
+    --ink:#16202C; --muted:#5B6675; --faint:#8A94A3;
+    --line:#E4E8EE; --line2:#EEF1F5;
+    --primary:#1F4E6B; --primary-soft:#E9F0F5;
+    --accent:#E4572E; --accent-soft:#FCEDE8;
+    --ok:#2E7D5B; --ok-soft:#E7F3EC;
+    --warn:#B8860B; --warn-soft:#FBF3DE;
+    --shadow:0 1px 2px rgba(16,32,44,.05),0 4px 16px rgba(16,32,44,.05);
+    --radius:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Segoe UI",Roboto,"Noto Sans KR",sans-serif;
+    -webkit-font-smoothing:antialiased; line-height:1.5;}
+  body{padding-bottom:88px; max-width:680px; margin:0 auto;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+
+  header{position:sticky; top:0; z-index:30; background:rgba(247,248,250,.92);
+    backdrop-filter:saturate(180%) blur(12px); border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;}
+  .brand{display:flex; align-items:baseline; gap:9px;}
+  .brand b{font-size:15px; letter-spacing:-.3px;}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--accent); display:inline-block; transform:translateY(-1px);}
+  .brand small{color:var(--faint); font-size:11.5px; margin-left:auto; font-variant-numeric:tabular-nums;}
+
+  nav.tabs{display:flex; gap:6px; overflow-x:auto; padding:10px 12px 4px; scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:0 0 auto; border:1px solid var(--line); background:var(--surface);
+    color:var(--muted); padding:8px 14px; border-radius:999px; font-size:13.5px;
+    font-weight:600; cursor:pointer; white-space:nowrap; transition:.15s;}
+  .tab[aria-selected="true"]{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .tab:focus-visible,.bb:focus-visible,.box:focus-visible,.daybtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  main{padding:6px 14px 20px;}
+  section[hidden]{display:none;}
+  h2.view-h{font-size:20px; letter-spacing:-.4px; margin:14px 2px 6px;}
+  .sub{color:var(--muted); font-size:13px; margin:0 2px 14px;}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:16px; margin-bottom:14px;}
+  .card h3{margin:0 0 3px; font-size:15px; letter-spacing:-.2px;}
+  .card .eyebrow{font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--primary); margin-bottom:8px;}
+
+  .hero{background:linear-gradient(135deg,#173A50,#1F4E6B); color:#fff; border:none;}
+  .hero .eyebrow{color:#A8C6D8;}
+  .hero .dday{display:flex; align-items:flex-end; gap:12px; margin:2px 0 10px;}
+  .hero .dnum{font-size:52px; font-weight:800; letter-spacing:-2px; line-height:.9; font-variant-numeric:tabular-nums;}
+  .hero .dlabel{font-size:14px; color:#CFE0EB; padding-bottom:7px;}
+  .hero .meta{font-size:13px; color:#DCE8F0; border-top:1px solid rgba(255,255,255,.16); padding-top:10px;}
+
+  .chk{display:flex; gap:12px; align-items:flex-start; padding:12px 2px; border-top:1px solid var(--line2);}
+  .chk:first-of-type{border-top:none;}
+  .box{flex:0 0 auto; width:24px; height:24px; border-radius:7px; border:2px solid #C7CFDA;
+    background:#fff; cursor:pointer; display:grid; place-items:center; margin-top:1px; transition:.12s;}
+  .box svg{width:14px;height:14px; opacity:0; transition:.12s;}
+  .box[aria-checked="true"]{background:var(--ok); border-color:var(--ok);}
+  .box[aria-checked="true"] svg{opacity:1;}
+  .chk .body{flex:1; min-width:0;}
+  .chk .lab{font-size:14.5px; font-weight:600; letter-spacing:-.1px;}
+  .chk[data-done="true"] .lab{color:var(--faint); text-decoration:line-through;}
+  .chk .metaline{font-size:12px; color:var(--muted); margin-top:3px; display:flex; flex-wrap:wrap; gap:6px 10px;}
+  .pill{font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; white-space:nowrap;}
+  .pill.due{background:var(--accent-soft); color:#B5401E;}
+  .pill.done{background:var(--ok-soft); color:var(--ok);}
+  .pill.vendor{background:var(--primary-soft); color:var(--primary);}
+  .pill.warn{background:var(--warn-soft); color:#8A6608;}
+  .chk .del{flex:0 0 auto; border:none; background:none; color:#C2C9D3; font-size:20px; cursor:pointer; padding:0 2px; line-height:1;}
+
+  .catrow{display:flex; align-items:center; justify-content:space-between; margin:22px 2px 4px;}
+  .catrow h3{font-size:16px; margin:0; letter-spacing:-.2px;}
+  .catrow .count{font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums;}
+  .progress{height:6px; background:var(--line2); border-radius:999px; overflow:hidden; margin:8px 2px 12px;}
+  .progress i{display:block; height:100%; background:var(--ok); border-radius:999px; transition:width .3s;}
+
+  .addbtn{width:100%; border:1.5px dashed var(--line); background:var(--surface2); color:var(--muted);
+    padding:12px; border-radius:12px; font-size:13.5px; font-weight:600; cursor:pointer; margin-top:4px;}
+
+  .daypick{display:flex; gap:7px; overflow-x:auto; padding:2px 2px 12px; scrollbar-width:none;}
+  .daypick::-webkit-scrollbar{display:none;}
+  .daybtn{flex:0 0 auto; min-width:58px; text-align:center; border:1px solid var(--line);
+    background:var(--surface); border-radius:12px; padding:9px 4px; cursor:pointer;}
+  .daybtn .d{font-size:16px; font-weight:800; letter-spacing:-.5px;}
+  .daybtn .w{font-size:11px; color:var(--muted); margin-top:1px;}
+  .daybtn[aria-selected="true"]{background:var(--primary); border-color:var(--primary); color:#fff;}
+  .daybtn[aria-selected="true"] .w{color:#CFE0EB;}
+  .daybtn[data-today="true"]::after{content:"오늘"; display:block; font-size:9px; font-weight:800; color:var(--accent); margin-top:2px;}
+  .daybtn[aria-selected="true"][data-today="true"]::after{color:#FFD9CC;}
+
+  .timerow{display:flex; gap:10px; padding:9px 0; border-top:1px solid var(--line2); font-size:13.5px;}
+  .timerow:first-child{border-top:none;}
+  .timerow .t{flex:0 0 92px; font-weight:700; font-variant-numeric:tabular-nums; color:var(--primary);}
+  .timerow .v{flex:1;}
+
+  .assign{border-top:1px solid var(--line2); padding:11px 0;}
+  .assign:first-child{border-top:none;}
+  .assign .z{font-size:12px; font-weight:800; color:var(--muted);}
+  .assign .p{font-size:14px; margin-top:2px;}
+
+  .sess{padding:9px 0; border-top:1px solid var(--line2); font-size:13.5px; display:flex; gap:9px;}
+  .sess:first-child{border-top:none;}
+  .sess .st{flex:0 0 52px; font-weight:700; color:var(--primary); font-variant-numeric:tabular-nums; font-size:12.5px;}
+  .sess .sv{flex:1;}
+  .sess .tag{display:inline-block; font-size:10px; font-weight:800; padding:1px 6px; border-radius:5px; margin-right:5px; vertical-align:1px;}
+  .tag.vip{background:#F3E8FF; color:#7B3FA0;}
+  .tag.bf{background:var(--primary-soft); color:var(--primary);}
+  .tag.nlk{background:var(--accent-soft); color:#B5401E;}
+  .tag.loc{background:var(--line2); color:var(--muted);}
+
+  .note{background:var(--warn-soft); border:1px solid #EBD9A6; border-radius:12px; padding:12px 13px;
+    font-size:13px; color:#6B5205; margin-bottom:12px;}
+  .note b{color:#5A4404;}
+  .info{background:var(--primary-soft); border:1px solid #CBDDE9; border-radius:12px; padding:11px 13px;
+    font-size:12.5px; color:#1B4258; margin-bottom:12px;}
+
+  .search{width:100%; border:1px solid var(--line); border-radius:12px; padding:12px 14px;
+    font-size:15px; margin-bottom:14px; background:var(--surface);}
+  .search:focus{outline:none; border-color:var(--primary);}
+  .cgroup{font-size:12px; font-weight:800; color:var(--faint); letter-spacing:.05em; margin:18px 4px 6px;}
+  .contact{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line);
+    border-radius:12px; padding:11px 13px; margin-bottom:8px;}
+  .contact .ci{flex:1; min-width:0;}
+  .contact .nm{font-size:14.5px; font-weight:600;}
+  .contact .rl{font-size:12px; color:var(--muted); margin-top:1px;}
+  .contact .call{flex:0 0 auto; width:42px; height:42px; border-radius:50%; background:var(--ok-soft);
+    display:grid; place-items:center; text-decoration:none;}
+  .contact .call svg{width:19px;height:19px;fill:var(--ok);}
+  .contact .call.none{background:var(--line2);}
+  .contact .call.none svg{fill:var(--faint);}
+
+  .loccard .row{display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid var(--line2); font-size:13.5px;}
+  .loccard .row:first-of-type{border-top:none;}
+  .loccard .row .k{color:var(--muted); flex:0 0 88px;}
+  .loccard .row .v{flex:1; text-align:right;}
+
+  .foot{text-align:center; color:var(--faint); font-size:11.5px; padding:16px 0 4px; line-height:1.7;}
+
+  .bottombar{position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgba(255,255,255,.95);
+    backdrop-filter:blur(12px); border-top:1px solid var(--line);
+    display:flex; padding:6px 6px calc(env(safe-area-inset-bottom) + 6px); max-width:680px; margin:0 auto;}
+  .bb{flex:1; border:none; background:none; padding:6px 2px; cursor:pointer; display:flex;
+    flex-direction:column; align-items:center; gap:3px; color:var(--faint); font-size:10.5px; font-weight:700;}
+  .bb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;}
+  .bb[aria-selected="true"]{color:var(--accent);}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="dot"></span><b>DCMI 2026 운영 보드</b><small id="clock"></small></div>
+</header>
+
+<nav class="tabs" id="tabs" role="tablist"></nav>
+
+<main>
+  <section id="view-today" role="tabpanel"></section>
+  <section id="view-day" role="tabpanel" hidden></section>
+  <section id="view-prep" role="tabpanel" hidden></section>
+  <section id="view-place" role="tabpanel" hidden></section>
+  <section id="view-contact" role="tabpanel" hidden></section>
+  <section id="view-vip" role="tabpanel" hidden></section>
+  <div class="foot">국립중앙도서관 · 국가서지과 · 담당 이아진<br>
+    개인 휴대폰 번호는 운영 단톡방에서 확인하세요</div>
+</main>
+
+<div class="bottombar" id="bottombar"></div>
+
+<script>
+/* =========================================================
+   [저장] 체크 상태를 이 브라우저에 저장합니다.
+   사람마다 각자 기기에 저장되며 서로 공유되지 않습니다.
+   ========================================================= */
+var KEY="dcmi2026_v1";
+var STATE={checks:{},hidden:[],custom:[]};
+var memFallback={};
+function loadState(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(raw){ var o=JSON.parse(raw); STATE.checks=o.checks||{}; STATE.hidden=o.hidden||[]; STATE.custom=o.custom||[]; }
+  }catch(e){
+    try{ if(memFallback[KEY]){ var o2=JSON.parse(memFallback[KEY]); STATE.checks=o2.checks||{}; STATE.hidden=o2.hidden||[]; STATE.custom=o2.custom||[]; } }catch(_){}
+  }
+}
+var saveT;
+function saveState(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    var s=JSON.stringify(STATE);
+    try{ localStorage.setItem(KEY,s); }catch(e){ memFallback[KEY]=s; }
+  },150);
+}
+function resetState(){
+  if(!confirm("이 기기에 저장된 모든 체크와 추가 항목을 지웁니다. 계속할까요?")) return;
+  STATE={checks:{},hidden:[],custom:[]};
+  try{ localStorage.removeItem(KEY); }catch(e){ memFallback={}; }
+  renderAll();
+}
+
+/* =========================================================
+   [데이터] 아래 내용을 고치면 페이지 내용이 바뀝니다.
+   ※ 이 페이지는 인터넷에 공개됩니다.
+     개인 휴대폰 번호 등 민감한 정보는 넣지 마세요.
+   ========================================================= */
+var CONF={startY:2026,startM:8,startD:3};
+
+var DAYS=[
+  {date:"8.3",dow:"월",work:{s:"08:00",l:"13:00–14:30",e:"18:00 / 18:45"},
+   rooms:"국제회의장 · 대강의실",
+   assign:[["오전 · 등록데스크","윤영조 · 이새롬 · 박상준"],["오전 · 국제회의장","이지연 · 안수연"],
+     ["오전 · 대강의실","윤대원"],["오전 · 총괄","오승연"],["오전 · 포스터/디너","이아진"],
+     ["오후 · 등록데스크","윤영조 · 이새롬"],["오후 · 국제회의장","박상준"]],
+   sess:[["09:00","워크숍 Wikidata / 학생 포럼(대강)"],
+     ["11:30","<span class='tag bf'>BIBFRAME</span>워크숍 Sinopia / 학생 포럼(대강)"],
+     ["14:30","워크숍 Worldview / NKOS 워크숍(대강, ~18:45)"]],
+   notes:["대강의실 NKOS 워크숍이 18:45까지 → 종료·시건 늦어짐","매일 07:00 개문·설비 세팅 시작"]},
+
+  {date:"8.4",dow:"화",work:{s:"08:00",l:"13:00–14:30",e:"20:00 (소셜디너)"},
+   rooms:"국제회의장 · 대강의실",
+   assign:[["오전 · 등록데스크","윤혜진 · 이새롬 · 박상준"],["오전 · 국제회의장","변유미 · 안수연"],
+     ["견학 13:30–14:30","오승연"],["오후 · 등록데스크","윤영조 · 이새롬"],
+     ["오후 · 국제회의장","박상준"],["오후 · 포스터/디너","윤영조 · 봉사자 전체"]],
+   sess:[["09:00","<span class='tag vip'>부장님</span>환영사 (박주옥→맹성현→오삼균)"],
+     ["09:30","<span class='tag vip'>부장님</span>개막 기조연설 — Min Kyung Lee"],
+     ["11:00","초청패널 Open Metadata / 일반패널 Ontology(대강)"],
+     ["13:30","<span class='tag vip'>부장님</span>주재 오찬 — 이딸리아 <b>(240 카드 필요)</b>"],
+     ["14:30","DDI→ISO 강연 / 논문 AI Knowledge(대강)"],
+     ["16:30","포스터 보드 세팅 시작"],
+     ["18:00","포스터 세션 &amp; 소셜 디너 (로비)"]],
+   notes:["소셜디너로 20:00까지 근무","포스터 보드 16:30부터 세팅 (가위·양면 폼테이프 준비)","부장님 오찬 240 카드 필요"]},
+
+  {date:"8.5",dow:"수",work:{s:"08:00",l:"12:30–14:00",e:"17:30"},
+   rooms:"국제회의장 · 대강의실",
+   assign:[["오전 · 등록데스크","윤혜진 · 변유미"],["오전 · 국제회의장","이지연 · 이새롬"],
+     ["견학 13:00–14:00","오승연"],["오후 · 등록데스크","윤영조 · 안수연"],
+     ["오후 · 국제회의장","박상준"],["오후 · 포스터/디너","윤영조 · 봉사자"]],
+   sess:[["09:00","기조패널 Identity in context"],["10:30","AI-Generated Rich Metadata"],
+     ["14:00","Framing Heritage / RDM(대강)"],["16:30","KCR5 강연 / Project reports(대강)"]],
+   notes:["점심시간이 12:30–14:00 (다른 날과 다름)","종료 17:30"]},
+
+  {date:"8.6",dow:"목",work:{s:"08:00",l:"13:00–14:30",e:"18:30"},
+   rooms:"국제회의장 · 대강의실 · 중강의실(오후)",
+   assign:[["오전 · 등록데스크","윤혜진 · 이새롬"],["오전 · 국제회의장","안수연 · 변유미"],
+     ["오전 · 대강의실","오승연"],["오후 · 등록데스크","이새롬"],["오후 · 국제회의장","박상준"]],
+   sess:[["09:00","폐막 기조연설 — Tom Cramer"],
+     ["11:00","<span class='tag bf'>BIBFRAME</span>초청패널 Implementation"],
+     ["14:30","<span class='tag bf'>BIBFRAME</span><span class='tag loc'>중강의실</span>논문 BIBFRAME &amp; KOS"],
+     ["14:30","<span class='tag vip'>부장님</span>BIBFRAME 미팅 — 오삼균·Tom Cramer (부장실)"],
+     ["17:00","AI-Assisted Enrichment / DCMI updates(대강)"]],
+   notes:["14:30–16:30 논문발표는 중강의실 진행 (국제회의장 ZOOM 불안정)","부장님 BIBFRAME 미팅 14:30–15:30 (부장실)"]},
+
+  {date:"8.7",dow:"금",work:{s:"08:00",l:"13:00–14:30",e:"14:00"},
+   rooms:"국제회의장",
+   assign:[["오전 · 등록데스크","윤대원 · 박상준"],["오전 · 국제회의장","이지연 · 이새롬"]],
+   sess:[["09:00","<span class='tag nlk'>우리관</span>운영사례 — JATS XML (Hyesun Han)"],
+     ["11:30","<span class='tag nlk'>우리관</span><span class='tag bf'>BIBFRAME</span>운영사례 — BIBFRAME 변환 (Seungmun Ahn)"],
+     ["14:30","<span class='tag bf'>BIBFRAME</span>논문 BIBFRAME &amp; KOS"]],
+   notes:["오전 세션 중심, 14:00 종료","관내 직원 기념품 행사 종료 후 일괄 배부"]}
+];
+
+var DAILY_OPEN=[
+  "사서연수관 중앙 출입문 열기 (방호실 서명 후 키 수령)",
+  "국제회의장·대강의실 출입문 개방 및 설비 세팅",
+  "회의장 내·외부 점검 (홍보물·안내사인 부착 확인)",
+  "AI 번역기 리더 로그인 및 작동 확인"
+];
+var DAILY_CLOSE=[
+  "회의장 정리 및 출입문 잠그기",
+  "사서연수관 중앙 출입문 잠그고 방호실에 키 반납"
+];
+
+var PREP={
+  "마감 준비 (~7/31)":[
+    {id:"p1",lab:"보도자료 배포",due:"7.27 공문 / 7.28 배포",vendor:"국홍팀",done:true},
+    {id:"p2",lab:"회의장 사전 테스트",due:"7.27 오후 · 7.31 오후",vendor:"운지과·인재개발과"},
+    {id:"p3",lab:"안내 메일 발송 (동시통역 사용법 포함)",due:"7.30 발송"},
+    {id:"p4",lab:"이젤 배차 신청",due:"7.29",vendor:"어청 대여",done:true},
+    {id:"p5",lab:"기념품 3종 수령",due:"~7.31",vendor:"㈜다알림"},
+    {id:"p6",lab:"폼보드·생수·구급함·문구류·다과 구입",due:"~7.31",vendor:"오피스디포 역삼점"},
+    {id:"p7",lab:"홍보물 제작 및 설치",due:"7.31 설치",vendor:"㈜계문사"},
+    {id:"p8",lab:"학생 봉사자 오리엔테이션",due:"7.31 14:00"},
+    {id:"p9",lab:"서식 준비 (출석부 2종·Wi-Fi·통역앱 안내문·견학자 명단)",due:"~7.31"}
+  ],
+  "물품":[
+    {id:"m1",lab:"VIP 명패"},{id:"m2",lab:"코사지 10개"},{id:"m3",lab:"명찰"},
+    {id:"m4",lab:"기념품 (파우치 · 볼펜?)",warn:"볼펜 포함 여부 확인"},
+    {id:"m5",lab:"이젤 (포스터 세션용)"},{id:"m6",lab:"생수"},
+    {id:"m7",lab:"VIP용 다과",warn:"미정"},{id:"m8",lab:"구급함"},
+    {id:"m9",lab:"문구류 (폼보드·A4 쇼케이스·멀티탭·투명클리어홀더)"}
+  ],
+  "홍보물 · 안내사인":[
+    {id:"h1",lab:"무대 세로 현수막 (좌우 각 1)"},{id:"h2",lab:"등록데스크 백월 1"},
+    {id:"h3",lab:"포디움 사이니지 3"},{id:"h4",lab:"유도 배너 국·영문 3세트"},
+    {id:"h5",lab:"포스터 국·영문 10세트"},{id:"h6",lab:"Wi-Fi 접속 안내문"},
+    {id:"h7",lab:"통역 어플 안내문"},{id:"h8",lab:"2층 강의실 유도 사인"}
+  ],
+  "장비":[
+    {id:"e1",lab:"빔프로젝터 · 전자교탁 · 노트북"},
+    {id:"e2",lab:"마이크 (국제 4 / 대·중강 각 2)"},
+    {id:"e3",lab:"음향 · 조명"},
+    {id:"e4",lab:"Wi-Fi (도서관 + KT 국제 2 / 대·중강 각 1)"},
+    {id:"e5",lab:"AI 번역기 계정 2개 (회의장별 다른 계정) 배포"}
+  ]
+};
+
+var TODO=[
+  {id:"t1",lab:"국제회의장 VIP 좌석 지정 여부 검토"},
+  {id:"t2",lab:"견학 집결용 피켓 필요 여부 결정"},
+  {id:"t3",lab:"주차 담당 연락처 확인 (문서상 번호 불일치)"},
+  {id:"t4",lab:"냉난방 담당 휴가 → 대직자 사전 인계"},
+  {id:"t5",lab:"대강의실 설비 담당 병가 → 장비 온·오프 직접 숙지"}
+];
+
+var PLACES=[
+  {n:"국제회의장",tag:"사서연수관 1층 · 8.3~8.7",
+   rows:[["좌석","144석 (책상 96 · 의자 48)"],["마이크","4개"],["Wi-Fi","KT 회선 2"],["담당","설비·Q&A·촬영·번역기"]],
+   extra:"VIP 좌석 지정 검토, 책상 부족 시 의자 추가"},
+  {n:"대강의실",tag:"사서연수관 2층 · 8.3~8.6",
+   rows:[["좌석","56석 (기둥 피해 배치)"],["마이크","2개"],["Wi-Fi","KT 회선 1"],["담당","설비 직접 세팅"]],
+   extra:"인재개발과 담당 병가 → 장비 사용법 숙지 필요. 8.3 외에는 세션이 늦거나 없음 → 1층 지원"},
+  {n:"중강의실",tag:"사서연수관 2층 · 8.6 오후만",
+   rows:[["좌석","36석"],["마이크","2개"],["용도","논문발표 세션"]],
+   extra:"8.6 14:30–16:30 논문발표 이동 진행 (국제회의장 ZOOM 불안정)"},
+  {n:"도서관 견학",tag:"본관·디지털도서관 · 8.4~8.5 점심",
+   rows:[["시간","8.4 13:30 / 8.5 13:00 (1시간)"],["인원","사전신청 20명 이내"],["집결","본관 1층 로비"],["담당","국홍팀"]],
+   extra:"1명은 로비에서 10분 대기 후 합류. 개인짐 허용, 출입명단 안내데스크 사전 공유"},
+  {n:"로비 (포스터·디너)",tag:"국제회의장 로비 · 8.4 18:00",
+   rows:[["세팅","이젤·포스터 보드 (16:30~)"],["디너","스탠딩·자율 참가"],["비치","구급함(등록데스크)"]],
+   extra:"종료 후 이젤 철거 및 포스터 보드 정리"}
+];
+
+/* 공개 페이지이므로 사무실 유선번호만 수록합니다. */
+var CONTACTS=[
+  {g:"국가서지과",list:[["류은영","과장","02-590-6330"],["안승문","사무관","02-3483-8833"],["이아진","행사 담당","02-590-6350"]]},
+  {g:"운영 인력",list:[["이지연","","02-590-0597"],["박상준","","02-590-6398"],["이새롬","","02-590-6361"],
+    ["윤대원","","02-3483-8812"],["오승연","","02-590-6371"],["윤혜진","","02-590-6355"],
+    ["윤영조","","02-590-6359"],["안수연","","02-590-6341"],["변유미","","02-590-6367"]]},
+  {g:"국제교류홍보팀",list:[["남향","통역","02-590-6318"],["조현우","사진","02-590-6324"],
+    ["유지현","언론홍보","02-590-6331"],["박지수","견학","02-590-0737"],["안록산나","견학","02-590-6326"]]},
+  {g:"운영지원과",list:[["이지영","회의장 대관","02-590-0648"],["이승섭","미화·좌석배치","02-590-0536"],
+    ["신봉수","조명·통신·음향","02-590-0631"],["방송실","","02-590-0777"],["제어실","행사장 조명","02-590-0773"],
+    ["김기범","냉난방 (휴가 예정)","02-590-0625"],["이은혁","냉난방 대직","02-590-0539"],
+    ["강규택","주차","02-590-0523"],["권일하","안전","02-590-0632"],
+    ["김유선","청사 출입","02-590-0732"],["방호실","키 수령·반납","02-590-0682"]]},
+  {g:"도서관 인재개발과",list:[["탁효원","연수관 시설","02-590-0551"],["임지성","연수관 시설(공무직)","02-590-0671"]]},
+  {g:"외부",list:[["한상은 박사","DCMI 행사 매니저","단톡방 참조"],["송원재 부장","㈜계문사 홍보물","단톡방 참조"],
+    ["엄재민 실장","그린파티 케이터링","02-3291-3004"],["노보텔 앰배서더 강남","숙박","02-531-6663"]]}
+];
+
+var VIP_SCHED=[
+  {d:"8.4 (화)",items:[["08:45","회의장 이동 (부장실→국제회의장) · 수행 과장/사무관"],
+    ["08:55","VIP 지정석 착석"],["09:00","개회·환영사 (영어 진행, 통역 없음)"],
+    ["09:30","개막 기조연설 — 이민경 (UT Austin)"],["10:30","휴식 · 부장실 이동"],
+    ["13:00","오찬 장소 이동"],["13:30","오찬 주재 — 이딸리아 · 외부 6명 · 240 카드 필요"]]},
+  {d:"8.6 (목)",items:[["14:30","BIBFRAME 미팅 (부장실) — 오삼균 · Tom Cramer · 통역 남향"]]}
+];
+var VIP_STAY=[["오삼균","DCMI","8/3–8/7","DCMI 결제"],["Tom Baker","DCMI","8/1–8/8","DCMI 결제"],
+  ["이민경","UT Austin","8/3–8/5","DCMI 결제"],["Kalliopi Mathios","Stanford","7/31–8/8","개별"],
+  ["Tom Cramer","Stanford","8/2–8/9","개별"],["Rochelle Lundy","Stanford","8/2–8/9","개별"],
+  ["Lydia Middleton","ASIS&T","8/1–8/7","개별"]];
+
+/* ========================= 렌더링 ========================= */
+var IC={
+  check:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  phone:'<svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z"/></svg>',
+  phoneO:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.2 2.2z"/></svg>',
+  today:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
+  cal:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8 14h4"/></svg>',
+  list:'<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+  pin:'<svg viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  star:'<svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19l1-5.8L3.5 9.2l5.9-.9z"/></svg>'
+};
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function isHidden(id){return STATE.hidden.indexOf(id)>=0;}
+function isDone(id){return !!STATE.checks[id];}
+function toggle(id){ STATE.checks[id]=!STATE.checks[id]; saveState(); renderAll(); }
+function hide(id){ if(STATE.hidden.indexOf(id)<0) STATE.hidden.push(id); saveState(); renderAll(); }
+
+function chkItem(it){
+  if(isHidden(it.id)) return "";
+  if(it.done && STATE.checks[it.id]===undefined) STATE.checks[it.id]=true;
+  var done=isDone(it.id);
+  var pills=[];
+  if(it.due) pills.push('<span class="pill '+(done?'done':'due')+'">'+it.due+'</span>');
+  if(it.vendor) pills.push('<span class="pill vendor">'+it.vendor+'</span>');
+  if(it.warn) pills.push('<span class="pill warn">⚠ '+it.warn+'</span>');
+  return '<div class="chk" data-done="'+done+'">'+
+    '<div class="box" role="checkbox" aria-checked="'+done+'" tabindex="0" aria-label="'+esc(it.lab)+'" '+
+    'onclick="toggle(\''+it.id+'\')" onkeydown="if(event.key===\' \'||event.key===\'Enter\'){event.preventDefault();toggle(\''+it.id+'\')}">'+IC.check+'</div>'+
+    '<div class="body"><div class="lab">'+it.lab+'</div>'+(pills.length?'<div class="metaline">'+pills.join("")+'</div>':'')+'</div>'+
+    '<button class="del" title="숨기기" aria-label="항목 숨기기" onclick="hide(\''+it.id+'\')">×</button></div>';
+}
+function allItems(){
+  var arr=[]; for(var k in PREP) arr=arr.concat(PREP[k]);
+  return arr.concat(TODO).concat(STATE.custom);
+}
+function daysToStart(){
+  var t=new Date(); t.setHours(0,0,0,0);
+  return Math.round((new Date(CONF.startY,CONF.startM-1,CONF.startD)-t)/86400000);
+}
+function currentEventIndex(){
+  var t=new Date(); t.setHours(0,0,0,0);
+  for(var i=0;i<DAYS.length;i++){
+    if(t.getTime()===new Date(CONF.startY,CONF.startM-1,CONF.startD+i).getTime()) return i;
+  } return -1;
+}
+function renderToday(){
+  var dd=daysToStart(), ei=currentEventIndex(), ddNum, ddText;
+  if(ei>=0){ ddNum="DAY "+(ei+1); ddText="행사 진행 중 · "+DAYS[ei].date+"("+DAYS[ei].dow+")"; }
+  else if(dd>1){ ddNum="D-"+dd; ddText="개막까지"; }
+  else if(dd===1){ ddNum="D-1"; ddText="내일 개막"; }
+  else if(dd===0){ ddNum="D-DAY"; ddText="오늘 개막"; }
+  else { ddNum="종료"; ddText="행사가 종료되었습니다"; }
+
+  var vis=allItems().filter(function(it){return !isHidden(it.id);});
+  var pending=vis.filter(function(it){return !isDone(it.id);});
+  var doneN=vis.length-pending.length;
+
+  var h='<div class="card hero"><div class="eyebrow">MEANING-DRIVEN AI</div>'+
+    '<div class="dday"><span class="dnum">'+ddNum+'</span><span class="dlabel">'+ddText+'</span></div>'+
+    '<div class="meta">8.3(월)~8.7(금) · 국립중앙도서관 · 참가 150여 명</div></div>';
+
+  h+='<div class="info">체크 표시는 <b>각자 기기에만</b> 저장됩니다. 서로 공유되지 않으니, 팀 공유가 필요한 사항은 단톡방에 알려주세요.</div>';
+
+  h+='<div class="catrow"><h3>남은 준비물</h3><span class="count">'+doneN+'/'+vis.length+' 완료</span></div>'+
+     '<div class="progress"><i style="width:'+(vis.length?Math.round(doneN/vis.length*100):0)+'%"></i></div>';
+  if(!pending.length){
+    h+='<div class="card" style="text-align:center;color:var(--ok);font-weight:700">모든 준비물 완료 ✓</div>';
+  }else{
+    h+='<div class="card">'+pending.slice(0,8).map(chkItem).join("")+
+      (pending.length>8?'<div class="metaline" style="padding:10px 2px 0">외 '+(pending.length-8)+'건 · 준비물 탭에서 확인</div>':'')+'</div>';
+  }
+
+  if(ei>=0){
+    var D=DAYS[ei];
+    h+='<div class="catrow"><h3>오늘 운영</h3></div><div class="card">'+
+      '<div class="timerow"><div class="t">출근</div><div class="v">'+D.work.s+'</div></div>'+
+      '<div class="timerow"><div class="t">점심</div><div class="v">'+D.work.l+'</div></div>'+
+      '<div class="timerow"><div class="t">종료</div><div class="v">'+D.work.e+'</div></div>'+
+      '<div class="timerow"><div class="t">회의장</div><div class="v">'+D.rooms+'</div></div></div>';
+    if(D.notes.length) h+='<div class="note"><b>특이사항</b><br>'+D.notes.join("<br>")+'</div>';
+  }
+
+  h+='<div class="catrow"><h3>바로 연결</h3></div><div class="card" style="padding:6px 13px">'+
+    [["방호실","키 수령·반납","02-590-0682"],["이아진","행사 담당","02-590-6350"],
+     ["신봉수","조명·통신·음향","02-590-0631"],["제어실","행사장 조명","02-590-0773"]]
+    .map(function(c){return '<div class="contact" style="border:none;box-shadow:none;padding:9px 0;margin:0;border-top:1px solid var(--line2)">'+
+      '<div class="ci"><div class="nm">'+c[0]+'</div><div class="rl">'+c[1]+' · '+c[2]+'</div></div>'+
+      '<a class="call" href="tel:'+c[2].replace(/-/g,"")+'" aria-label="전화 걸기">'+IC.phone+'</a></div>';}).join("")+'</div>';
+
+  $("#view-today").innerHTML=h;
+}
+
+var selDay=Math.max(0,currentEventIndex());
+function setDay(i){ selDay=i; renderDay(); }
+function renderDay(){
+  var h='<h2 class="view-h">일정 · 운영</h2><p class="sub">날짜를 눌러 그날의 근무·업무분장·세션을 확인하세요.</p>';
+  h+='<div class="daypick">'+DAYS.map(function(D,i){
+    return '<div class="daybtn" role="button" tabindex="0" aria-selected="'+(i===selDay)+'" data-today="'+(i===currentEventIndex())+'" '+
+      'onclick="setDay('+i+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();setDay('+i+')}">'+
+      '<div class="d">'+D.date+'</div><div class="w">'+D.dow+'</div></div>';}).join("")+'</div>';
+
+  var D=DAYS[selDay];
+  h+='<div class="card"><div class="eyebrow">근무 시간</div>'+
+    '<div class="timerow"><div class="t">출근</div><div class="v">'+D.work.s+'</div></div>'+
+    '<div class="timerow"><div class="t">점심</div><div class="v">'+D.work.l+'</div></div>'+
+    '<div class="timerow"><div class="t">종료</div><div class="v">'+D.work.e+'</div></div>'+
+    '<div class="timerow"><div class="t">회의장</div><div class="v">'+D.rooms+'</div></div></div>';
+  if(D.notes.length) h+='<div class="note"><b>특이사항</b><br>'+D.notes.join("<br>")+'</div>';
+  h+='<div class="card"><div class="eyebrow">업무 분장</div>'+
+    D.assign.map(function(a){return '<div class="assign"><div class="z">'+a[0]+'</div><div class="p">'+a[1]+'</div></div>';}).join("")+'</div>';
+  h+='<div class="card"><div class="eyebrow">세션 하이라이트</div>'+
+    D.sess.map(function(s){return '<div class="sess"><div class="st">'+s[0]+'</div><div class="sv">'+s[1]+'</div></div>';}).join("")+'</div>';
+
+  var dk=D.date.replace(".","_");
+  h+='<div class="card"><div class="eyebrow">개문 · 07:00~09:00</div>'+
+    DAILY_OPEN.map(function(x,i){return chkItem({id:"open_"+dk+"_"+i,lab:x});}).join("")+'</div>';
+  h+='<div class="card"><div class="eyebrow">폐문 · 종료 후</div>'+
+    DAILY_CLOSE.map(function(x,i){return chkItem({id:"close_"+dk+"_"+i,lab:x});}).join("")+'</div>';
+  $("#view-day").innerHTML=h;
+}
+
+function renderPrep(){
+  var h='<h2 class="view-h">준비물 체크리스트</h2><p class="sub">체크 · 숨기기(×) · 추가가 가능합니다. 이 기기에 자동 저장됩니다.</p>';
+  for(var cat in PREP){
+    var vis=PREP[cat].filter(function(it){return !isHidden(it.id);});
+    var d=vis.filter(function(it){return isDone(it.id)||(it.done&&STATE.checks[it.id]===undefined);}).length;
+    h+='<div class="catrow"><h3>'+cat+'</h3><span class="count">'+d+'/'+vis.length+'</span></div>'+
+      '<div class="progress"><i style="width:'+(vis.length?Math.round(d/vis.length*100):0)+'%"></i></div>'+
+      '<div class="card">'+(vis.map(chkItem).join("")||'<div class="sub" style="margin:4px 2px">항목 없음</div>')+'</div>';
+  }
+  var tv=TODO.filter(function(it){return !isHidden(it.id);});
+  h+='<div class="catrow"><h3>확인 · 미정 사항</h3><span class="count">'+tv.filter(function(it){return isDone(it.id);}).length+'/'+tv.length+'</span></div>'+
+     '<div class="card">'+(tv.map(chkItem).join("")||'<div class="sub" style="margin:4px 2px">모두 처리됨</div>')+'</div>';
+  var cv=STATE.custom.filter(function(it){return !isHidden(it.id);});
+  h+='<div class="catrow"><h3>직접 추가</h3><span class="count">'+cv.filter(function(it){return isDone(it.id);}).length+'/'+cv.length+'</span></div>'+
+     '<div class="card">'+cv.map(chkItem).join("")+'<button class="addbtn" onclick="addItem()">+ 항목 추가</button></div>';
+  h+='<div style="text-align:center;padding:6px 0 10px"><button class="addbtn" style="width:auto;padding:9px 18px;border-style:solid" onclick="resetState()">체크 전체 초기화</button></div>';
+  $("#view-prep").innerHTML=h;
+}
+function addItem(){
+  var v=prompt("추가할 준비 항목을 입력하세요");
+  if(v&&v.trim()){ STATE.custom.push({id:"c"+Date.now(),lab:esc(v.trim())}); saveState(); renderAll(); }
+}
+
+function renderPlace(){
+  var h='<h2 class="view-h">장소별 안내</h2><p class="sub">회의장 · 견학 · 로비별 좌석, 장비, 담당 업무.</p>';
+  h+=PLACES.map(function(P){
+    return '<div class="card loccard"><h3>'+P.n+'</h3>'+
+      '<div class="metaline" style="margin:2px 0 6px"><span class="pill vendor">'+P.tag+'</span></div>'+
+      P.rows.map(function(r){return '<div class="row"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>';}).join("")+
+      (P.extra?'<div class="note" style="margin:12px 0 0">'+P.extra+'</div>':'')+'</div>';}).join("");
+  $("#view-place").innerHTML=h;
+}
+
+function renderContact(f){
+  f=f||""; var q=f.trim().toLowerCase();
+  var h='<h2 class="view-h">연락처</h2>'+
+    '<div class="info">공개 페이지이므로 <b>사무실 유선번호</b>만 수록했습니다. 휴대폰 번호는 운영 단톡방을 확인하세요.</div>'+
+    '<input class="search" placeholder="이름 · 부서 · 역할 검색" value="'+esc(f)+'" oninput="renderContact(this.value)" autocomplete="off">';
+  CONTACTS.forEach(function(G){
+    var list=G.list.filter(function(c){return !q || (c[0]+c[1]+G.g).toLowerCase().indexOf(q)>=0;});
+    if(!list.length) return;
+    h+='<div class="cgroup">'+G.g+'</div>';
+    list.forEach(function(c){
+      var has=/\d/.test(c[2]);
+      h+='<div class="contact"><div class="ci"><div class="nm">'+c[0]+
+        (c[1]?' · <span style="color:var(--muted);font-weight:500">'+c[1]+'</span>':'')+'</div>'+
+        '<div class="rl">'+c[2]+'</div></div>'+
+        (has?'<a class="call" href="tel:'+c[2].replace(/-/g,"")+'" aria-label="전화 걸기">'+IC.phone+'</a>'
+           :'<span class="call none">'+IC.phone+'</span>')+'</div>';
+    });
+  });
+  $("#view-contact").innerHTML=h;
+  var inp=$("#view-contact .search"); if(inp&&f){ inp.focus(); inp.setSelectionRange(f.length,f.length); }
+}
+
+function renderVip(){
+  var h='<h2 class="view-h">의전 · VIP</h2><p class="sub">부장님 일정, 주요 인사, 숙박.</p>';
+  h+='<div class="card"><div class="eyebrow">주요 인사</div>'+
+    '<div class="assign"><div class="z">오삼균 교수 (DCMI)</div><div class="p">전 기간 참여</div></div>'+
+    '<div class="assign"><div class="z">맹성현 교수 (KAIST)</div><div class="p">오프닝(8.4)만 참여</div></div></div>';
+  VIP_SCHED.forEach(function(S){
+    h+='<div class="card"><div class="eyebrow">박주옥 부장님 · '+S.d+'</div>'+
+      S.items.map(function(i){return '<div class="sess"><div class="st">'+i[0]+'</div><div class="sv">'+i[1]+'</div></div>';}).join("")+'</div>';
+  });
+  h+='<div class="card"><div class="eyebrow">숙박 · 노보텔 앰배서더 강남</div>'+
+    VIP_STAY.map(function(v){return '<div class="assign"><div class="p"><b>'+v[0]+'</b> · '+v[1]+'</div>'+
+      '<div class="z" style="margin-top:2px">'+v[2]+' · '+v[3]+'</div></div>';}).join("")+'</div>';
+  $("#view-vip").innerHTML=h;
+}
+
+var VIEWS=[
+  {id:"today",label:"오늘",icon:IC.today,render:renderToday},
+  {id:"day",label:"일정",icon:IC.cal,render:renderDay},
+  {id:"prep",label:"준비물",icon:IC.list,render:renderPrep},
+  {id:"place",label:"장소",icon:IC.pin,render:renderPlace},
+  {id:"contact",label:"연락처",icon:IC.phoneO,render:function(){renderContact("");}},
+  {id:"vip",label:"의전",icon:IC.star.replace('viewBox','fill="none" stroke="currentColor" stroke-width="1.9" viewBox'),render:renderVip}
+];
+var cur="today";
+function show(id){
+  cur=id;
+  VIEWS.forEach(function(v){ $("#view-"+v.id).hidden=(v.id!==id); });
+  Array.prototype.forEach.call(document.querySelectorAll("#tabs .tab"),function(t){t.setAttribute("aria-selected",t.dataset.v===id);});
+  Array.prototype.forEach.call(document.querySelectorAll("#bottombar .bb"),function(b){b.setAttribute("aria-selected",b.dataset.v===id);});
+  var v=VIEWS.filter(function(x){return x.id===id;})[0]; if(v) v.render();
+  window.scrollTo(0,0);
+}
+function renderAll(){ var v=VIEWS.filter(function(x){return x.id===cur;})[0]; if(v) v.render(); }
+function buildNav(){
+  $("#tabs").innerHTML=VIEWS.map(function(v){return '<button class="tab" role="tab" data-v="'+v.id+'" onclick="show(\''+v.id+'\')">'+v.label+'</button>';}).join("");
+  $("#bottombar").innerHTML=VIEWS.map(function(v){return '<button class="bb" data-v="'+v.id+'" onclick="show(\''+v.id+'\')">'+v.icon+'<span>'+v.label+'</span></button>';}).join("");
+}
+function tick(){
+  var n=new Date(), wd=["일","월","화","수","목","금","토"][n.getDay()];
+  $("#clock").textContent=(n.getMonth()+1)+"."+n.getDate()+"("+wd+") "+
+    String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
+}
+loadState(); buildNav(); tick(); setInterval(tick,30000); show("today");
+</script>
+</body>
+</html>
